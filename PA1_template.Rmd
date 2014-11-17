@@ -1,0 +1,100 @@
+---
+title: "PA1_template.Rmd"
+author: "Armand"
+date: "Monday, November 17, 2014"
+output: html_document
+---
+
+
+#Loading and preprocessing the data
+
+. load and processing data
+
+```{r}
+library(plyr)
+data<-read.csv("activity.csv", sep=",", header=TRUE)
+step<- data[!is.na(data$steps),]
+totalsteps<-ddply(step, .(date), summarize, total=sum(steps))
+```
+
+. plot data
+
+```{r}
+hist(totalsteps$total, xlab="Total steps per day",col="navy", main=" Histogram of total steps taken per day" )
+```
+
+. Calculate and report the mean and median total number of steps taken per day
+
+```{r}
+smean<-mean(totalsteps$total)
+smedia<-median(totalsteps$total)
+```
+
+
+
+# What is the average daily activity pattern?
+
+.Make a time series plot (i.e. type = ???l???) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+```{r}
+intervalsteps<-ddply(step, .(interval), summarize, total=mean(steps))
+plot(intervalsteps$interval,intervalsteps$total, type="l" ,xlab="Time Interval (5 min)", ylab=" Mean Steps per day", main ="Average steps taken in 5 min Interval", col="green")
+
+```
+
+
+.Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps? 
+
+```{r}
+
+max<-intervalsteps[which.max(intervalsteps$total),1]
+```
+
+# Imputing missing values
+
+.Calculate and report the total number of missing values in the dataset (i .e. the total number of rows with NAs)
+
+```{r}
+
+nas<-sum(is.na(data$steps))
+  
+```
+
+.Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+```{r}
+data2<-data
+
+index1<-(which(is.na(data$steps)))
+
+
+ for(index in index1) {
+    
+    data2$steps[index]<- intervalsteps[intervalsteps$interval == data2$interval[index], ]$total
+    
+}
+
+
+totalsteps2<-ddply(data2, .(date), summarize, total=sum(steps))
+
+  
+```
+
+
+. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
+
+
+```{r}
+hist(totalsteps$total, xlab="Total steps per day",col="magenta", main=" Histogram of total steps taken per day with NA filled" )
+
+smean2<-mean(totalsteps2$total)
+smedia2<-median(totalsteps2$total)
+  
+```
+
+
+
+
+
+
+
