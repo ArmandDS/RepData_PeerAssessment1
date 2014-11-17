@@ -98,5 +98,3 @@ smedia2<-median(totalsteps2$total)
 
 
 
-
-
